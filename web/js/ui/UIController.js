@@ -522,6 +522,7 @@ class UIController {
                 <th>Median Corpus</th>
                 <th>25th Percentile</th>
                 <th>75th Percentile</th>
+                <th>Annual Expense</th>
                 <th>Depletion Risk</th>
             </tr>
         `;
@@ -545,6 +546,7 @@ class UIController {
                 <td>${FormatUtil.formatNumber(yearData.medianValue)}</td>
                 <td>${FormatUtil.formatNumber(yearData.percentiles[25])}</td>
                 <td>${FormatUtil.formatNumber(yearData.percentiles[75])}</td>
+                <td>${FormatUtil.formatNumber(yearData.adjustedAnnualExpense)}</td>
                 <td>${yearData.depletionRate.toFixed(1)}%</td>
             `;
             
@@ -671,6 +673,71 @@ class UIController {
                         title: {
                             display: true,
                             text: 'Corpus Value'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return FormatUtil.formatNumberShort(value);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Create an additional chart for inflation-adjusted expenses
+        const expensesChartContainer = document.createElement('div');
+        expensesChartContainer.className = 'mt-4';
+        expensesChartContainer.innerHTML = '<h4 class="mb-3">Inflation-Adjusted Annual Expenses</h4>';
+        const expensesCanvas = document.createElement('canvas');
+        expensesCanvas.id = 'expensesChart';
+        expensesChartContainer.appendChild(expensesCanvas);
+        
+        // Add the chart container to the modal
+        trackingContent.appendChild(expensesChartContainer);
+        
+        // Create expenses chart
+        const expensesCtx = expensesCanvas.getContext('2d');
+        new Chart(expensesCtx, {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [
+                    {
+                        label: 'Annual Expenses',
+                        data: chartData.annualExpenses,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderWidth: 2,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Inflation-Adjusted Annual Expenses'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${FormatUtil.formatNumber(context.raw)}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Age'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Amount'
                         },
                         ticks: {
                             callback: function(value) {
@@ -993,6 +1060,7 @@ class UIController {
                 <th>Median Corpus</th>
                 <th>25th Percentile</th>
                 <th>75th Percentile</th>
+                <th>Annual Expense</th>
                 <th>Depletion Risk</th>
             </tr>
         `;
@@ -1016,6 +1084,7 @@ class UIController {
                 <td>${FormatUtil.formatNumber(yearData.medianValue)}</td>
                 <td>${FormatUtil.formatNumber(yearData.percentiles[25])}</td>
                 <td>${FormatUtil.formatNumber(yearData.percentiles[75])}</td>
+                <td>${FormatUtil.formatNumber(yearData.adjustedAnnualExpense)}</td>
                 <td>${yearData.depletionRate.toFixed(1)}%</td>
             `;
             
@@ -1142,6 +1211,71 @@ class UIController {
                         title: {
                             display: true,
                             text: 'Corpus Value'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return FormatUtil.formatNumberShort(value);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Create an additional chart for inflation-adjusted expenses
+        const expensesChartContainer = document.createElement('div');
+        expensesChartContainer.className = 'mt-4';
+        expensesChartContainer.innerHTML = '<h4 class="mb-3">Inflation-Adjusted Annual Expenses</h4>';
+        const expensesCanvas = document.createElement('canvas');
+        expensesCanvas.id = 'expensesChart';
+        expensesChartContainer.appendChild(expensesCanvas);
+        
+        // Add the chart container to the modal
+        trackingContent.appendChild(expensesChartContainer);
+        
+        // Create expenses chart
+        const expensesCtx = expensesCanvas.getContext('2d');
+        new Chart(expensesCtx, {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [
+                    {
+                        label: 'Annual Expenses',
+                        data: chartData.annualExpenses,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderWidth: 2,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Inflation-Adjusted Annual Expenses'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${FormatUtil.formatNumber(context.raw)}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Age'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Amount'
                         },
                         ticks: {
                             callback: function(value) {
