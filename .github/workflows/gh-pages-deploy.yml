@@ -3,32 +3,21 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # Set to your default branch
-
-permissions:
-  contents: write  # Allow writing to the repository to create or update gh-pages branch
-  pages: write
-  id-token: write
+      - main
 
 jobs:
-  build-and-deploy:
+  github-pages:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-      
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        
+      
       - name: Setup Pages
         uses: actions/configure-pages@v3
-        
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+      
+      - name: Deploy web directory to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          path: 'web'
-          
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v1
+          folder: web # The folder the action should deploy
+          branch: gh-pages # The branch the action should deploy to
+          clean: true # Automatically remove deleted files from the deployment branch
