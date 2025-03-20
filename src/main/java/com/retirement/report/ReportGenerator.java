@@ -2,6 +2,7 @@ package com.retirement.report;
 
 import com.retirement.model.RetirementParameters;
 import com.retirement.model.YearlyTracking;
+import com.retirement.util.LocaleConfig;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -16,7 +17,6 @@ import java.util.Map;
  * Class responsible for formatting and presenting results in reports.
  */
 public class ReportGenerator {
-    private static final DecimalFormat MONEY_FORMAT = new DecimalFormat("$#,##0.00");
     private static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.0%");
     
     /**
@@ -241,11 +241,7 @@ public class ReportGenerator {
      * @return Formatted money string
      */
     private String formatMoney(double value) {
-        if (value >= 1_000_000) {
-            return String.format("$%,.2fM", value / 1_000_000);
-        } else {
-            return String.format("$%,.2f", value);
-        }
+        return LocaleConfig.formatMoney(value);
     }
     
     private void generateKeyInsights(RetirementParameters params, List<YearlyTracking> trackingData, StringBuilder report) {

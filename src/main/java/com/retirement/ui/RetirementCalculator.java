@@ -6,12 +6,14 @@ import com.retirement.engine.ScenarioGenerator;
 import com.retirement.model.RetirementParameters;
 import com.retirement.model.YearlyTracking;
 import com.retirement.report.ReportGenerator;
+import com.retirement.util.LocaleConfig;
 
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -24,7 +26,7 @@ public class RetirementCalculator {
     private final CorpusTracker corpusTracker;
     private final ScenarioGenerator scenarioGenerator;
     private final ReportGenerator reportGenerator;
-    private final DecimalFormat moneyFormat;
+    private NumberFormat moneyFormat;
     
     /**
      * Constructor for RetirementCalculator.
@@ -35,7 +37,22 @@ public class RetirementCalculator {
         this.corpusTracker = new CorpusTracker();
         this.scenarioGenerator = new ScenarioGenerator();
         this.reportGenerator = new ReportGenerator();
-        this.moneyFormat = new DecimalFormat("$#,##0.00");
+        this.moneyFormat = LocaleConfig.getCurrencyFormatter();
+    }
+    
+    /**
+     * Display the main menu.
+     */
+    private void displayMenu() {
+        System.out.println("\n====================================================");
+        System.out.println("      RETIREMENT CORPUS STOCHASTIC CALCULATOR       ");
+        System.out.println("====================================================");
+        System.out.println("1. Basic Mode - Corpus Calculation");
+        System.out.println("2. Advanced Mode - Personalized Planning");
+        System.out.println("3. Help and Information");
+        System.out.println("4. Exit");
+        System.out.println("5. Configure Locale and Currency");
+        System.out.println("====================================================");
     }
     
     /**
@@ -46,7 +63,7 @@ public class RetirementCalculator {
         
         while (running) {
             displayMenu();
-            int choice = getIntInput("Enter your choice: ", 1, 4);
+            int choice = getIntInput("Enter your choice: ", 1, 5);
             
             switch (choice) {
                 case 1:
@@ -61,25 +78,14 @@ public class RetirementCalculator {
                 case 4:
                     running = false;
                     break;
+                case 5:
+                    configureLocale();
+                    break;
             }
         }
         
         System.out.println("Thank you for using the Retirement Corpus Stochastic Calculator!");
         scanner.close();
-    }
-    
-    /**
-     * Display the main menu.
-     */
-    private void displayMenu() {
-        System.out.println("\n====================================================");
-        System.out.println("      RETIREMENT CORPUS STOCHASTIC CALCULATOR       ");
-        System.out.println("====================================================");
-        System.out.println("1. Basic Mode - Corpus Calculation");
-        System.out.println("2. Advanced Mode - Personalized Planning");
-        System.out.println("3. Help and Information");
-        System.out.println("4. Exit");
-        System.out.println("====================================================");
     }
     
     /**
@@ -91,7 +97,7 @@ public class RetirementCalculator {
         // Collect inputs with defaults
         System.out.println("\nPlease enter the following information (or press Enter for default):");
         
-        double annualExpense = getDoubleInputWithDefault("Annual expenses: ($) ", 60000);
+        double annualExpense = getDoubleInputWithDefault("Annual expenses: (" + LocaleConfig.getCurrencySymbol() + ") ", 60000);
         int retirementPeriod = getIntInputWithDefault("Retirement period (years): ", 30);
         double expectedReturn = getDoubleInputWithDefault("Expected annual return (%): ", 7) / 100.0;
         double stdDev = getDoubleInputWithDefault("Annual standard deviation (%): ", 10) / 100.0;
@@ -140,10 +146,10 @@ public class RetirementCalculator {
         int currentAge = getIntInputWithDefault("Current age: ", 40);
         int retirementAge = getIntInputWithDefault("Target retirement age: ", 65);
         int lifeExpectancy = getIntInputWithDefault("Life expectancy: ", 90);
-        double currentCorpus = getDoubleInputWithDefault("Current retirement corpus: ($) ", 500000);
-        double annualExpense = getDoubleInputWithDefault("Annual expenses: ($) ", 80000);
-        double annualContribution = getDoubleInputWithDefault("Annual contribution: ($) ", 30000);
-        double additionalIncome = getDoubleInputWithDefault("Additional retirement income (e.g., pension, Social Security): ($) ", 20000);
+        double currentCorpus = getDoubleInputWithDefault("Current retirement corpus: (" + LocaleConfig.getCurrencySymbol() + ") ", 500000);
+        double annualExpense = getDoubleInputWithDefault("Annual expenses: (" + LocaleConfig.getCurrencySymbol() + ") ", 80000);
+        double annualContribution = getDoubleInputWithDefault("Annual contribution: (" + LocaleConfig.getCurrencySymbol() + ") ", 30000);
+        double additionalIncome = getDoubleInputWithDefault("Additional retirement income (e.g., pension, Social Security): (" + LocaleConfig.getCurrencySymbol() + ") ", 20000);
         double expectedReturn = getDoubleInputWithDefault("Expected annual return (%): ", 7) / 100.0;
         double stdDev = getDoubleInputWithDefault("Annual standard deviation (%): ", 10) / 100.0;
         double inflation = getDoubleInputWithDefault("Annual inflation rate (%): ", 3) / 100.0;
@@ -344,6 +350,55 @@ public class RetirementCalculator {
         
         System.out.println("\nPress Enter to return to the main menu...");
         scanner.nextLine();
+    }
+    
+    /**
+     * Configure the locale and currency.
+     */
+    private void configureLocale() {
+        System.out.println("\n--- LOCALE AND CURRENCY CONFIGURATION ---");
+        System.out.println("Available locales:");
+        System.out.println("1. India - English (INR - ₹)");
+        System.out.println("2. United States (USD - $)");
+        System.out.println("3. Eurozone (EUR - €)");
+        System.out.println("4. United Kingdom (GBP - £)");
+        System.out.println("5. Japan (JPY - ¥)");
+        System.out.println("6. Other (specify language tag)");
+        
+        int choice = getIntInput("Select locale (1-6): ", 1, 6);
+        
+        switch (choice) {
+            case 1:
+                LocaleConfig.setLocale(Locale.forLanguageTag("en-IN"));
+                break;
+            case 2:
+                LocaleConfig.setLocale(Locale.US);
+                break;
+            case 3:
+                LocaleConfig.setLocale(Locale.FRANCE); // Euro
+                break;
+            case 4:
+                LocaleConfig.setLocale(Locale.UK);
+                break;
+            case 5:
+                LocaleConfig.setLocale(Locale.JAPAN);
+                break;
+            case 6:
+                System.out.print("Enter locale (e.g., en-US, fr-FR): ");
+                String localeTag = scanner.nextLine().trim();
+                if (!localeTag.isEmpty()) {
+                    LocaleConfig.setLocale(localeTag);
+                }
+                break;
+        }
+        
+        // Refresh the money formatter
+        this.moneyFormat = LocaleConfig.getCurrencyFormatter();
+        
+        System.out.println("Locale set to: " + LocaleConfig.getCurrentLocale().getDisplayName());
+        System.out.println("Currency: " + LocaleConfig.getCurrency().getDisplayName() + 
+                         " (" + LocaleConfig.getCurrencySymbol() + ")");
+        System.out.println("Example format: " + LocaleConfig.formatMoney(12345.67));
     }
     
     /**

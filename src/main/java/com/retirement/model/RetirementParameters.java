@@ -1,5 +1,7 @@
 package com.retirement.model;
 
+import java.util.Locale;
+
 /**
  * Model class to store retirement parameters for calculations.
  */
@@ -23,6 +25,9 @@ public class RetirementParameters {
     
     // Simulation parameters
     private int numSimulations;
+    
+    // Locale parameter
+    private Locale locale = new Locale.Builder().setLanguage("en").setRegion("IN").build(); // Default is now English-India
     
     // Constructor for basic mode
     public RetirementParameters(double annualExpense, int retirementPeriod, 
@@ -171,6 +176,22 @@ public class RetirementParameters {
     
     public void setNumSimulations(int numSimulations) {
         this.numSimulations = numSimulations;
+    }
+    
+    /**
+     * Get the locale for currency and number formatting.
+     * @return The locale
+     */
+    public Locale getLocale() {
+        return locale;
+    }
+    
+    /**
+     * Set the locale for currency and number formatting.
+     * @param locale The locale to set
+     */
+    public void setLocale(Locale locale) {
+        this.locale = locale;
     }
     
     /**
