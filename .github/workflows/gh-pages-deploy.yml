@@ -21,6 +21,11 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v3
       
+      # Create .nojekyll file to bypass Jekyll processing
+      - name: Create .nojekyll file
+        run: touch web/.nojekyll
+        
+      # Deploy the web directory
       - name: Deploy web directory to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
