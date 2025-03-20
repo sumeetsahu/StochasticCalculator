@@ -5,6 +5,12 @@ on:
     branches:
       - main
 
+# Required permissions for GitHub Pages deployment
+permissions:
+  contents: write    # This allows the action to create/modify the gh-pages branch
+  pages: write       # This allows the action to publish to GitHub Pages
+  id-token: write    # This is needed for Pages authentication
+
 jobs:
   github-pages:
     runs-on: ubuntu-latest
