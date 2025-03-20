@@ -1,0 +1,90 @@
+/* Main styles for the Retirement Corpus Stochastic Calculator */
+
+.card {
+    border-radius: 0.5rem;
+}
+
+.card-header {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Status indicators */
+.status-indicator {
+    width: 100%;
+    height: 30px;
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.status-segment {
+    height: 100%;
+    float: left;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+
+/* Chart container */
+.chart-container {
+    position: relative;
+    margin: auto;
+    height: 300px;
+    width: 100%;
+}
+
+/* Simulation progress */
+.progress-container {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Scenario cards */
+.scenario-card {
+    height: 100%;
+    transition: transform 0.2s ease;
+}
+
+.scenario-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* Help accordion styles */
+.accordion-button:not(.collapsed) {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+}
+
+.accordion-button:focus {
+    box-shadow: none;
+    border-color: rgba(0,0,0,.125);
+}
+
+/* Loading spinner */
+.spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+}
+
+/* Custom tooltip */
+.tooltip-inner {
+    max-width: 300px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+    .card-body {
+        padding: 1rem;
+    }
+}
