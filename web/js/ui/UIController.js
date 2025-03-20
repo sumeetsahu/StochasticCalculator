@@ -350,27 +350,18 @@ class UIController {
         
         // Use setTimeout to allow the UI to update before starting calculations
         setTimeout(() => {
-            // Run the full simulation first
-            const projectedCorpus = this.monteCarloEngine.calculateProjectedCorpus(scenarioParams);
-            const successRate = this.monteCarloEngine.simulateRetirementWithCorpus(
-                projectedCorpus, 
-                scenarioParams, 
-                progress => this.updateModalProgress(progress * 0.5, 'Running simulations...')
-            );
-            
-            // Get the final corpus values from the full simulation
-            const corpusValues = this.monteCarloEngine.getLastSimulationResults();
-            
-            // Then generate year-by-year tracking
+            // Generate year-by-year tracking
             const corpusTracker = new CorpusTracker();
+            const projectedCorpus = this.monteCarloEngine.calculateProjectedCorpus(scenarioParams);
+            
             const tracking = corpusTracker.generateYearlyTracking(
                 scenarioParams, 
                 scenarioParams.currentCorpus,
-                progress => this.updateModalProgress(0.5 + progress * 0.5, 'Generating year-by-year tracking...')
+                progress => this.updateModalProgress(progress, 'Generating year-by-year tracking...')
             );
             
-            // Update the modal content with tracking results and simulation outcomes
-            this.displayYearByYearTracking(scenarioName, scenarioParams, tracking, projectedCorpus, successRate, corpusValues);
+            // Update the modal content with tracking results
+            this.displayYearByYearTracking(scenarioName, scenarioParams, tracking, projectedCorpus);
         }, 50);
     }
     
@@ -498,95 +489,31 @@ class UIController {
      * @param {RetirementParameters} params - The scenario parameters
      * @param {Array<Object>} tracking - Year-by-year tracking data
      * @param {number} projectedCorpus - Projected corpus at retirement
-     * @param {number} successRate - Success rate of the simulation
-     * @param {Array<number>} corpusValues - Final corpus values from simulation
      */
-    displayYearByYearTracking(scenarioName, params, tracking, projectedCorpus, successRate, corpusValues) {
-        // Show tracking content and hide progress
+    displayYearByYearTracking(scenarioName, params, tracking, projectedCorpus) {
+        // Hide progress and show content
+        document.getElementById('modalProgressContainer').style.display = 'none';
+        
         const trackingContent = document.getElementById('trackingContent');
         trackingContent.style.display = 'block';
         
-        const progressContainer = document.getElementById('modalProgressContainer');
-        progressContainer.style.display = 'none';
+        // Create canvas for chart
+        const chartContainer = document.createElement('div');
+        chartContainer.className = 'mb-4';
         
-        // Clear previous content
-        trackingContent.innerHTML = '';
+        const canvas = document.createElement('canvas');
+        canvas.id = 'trackingChart';
+        canvas.height = 300;
+        chartContainer.appendChild(canvas);
         
-        // Add summary section
-        const summarySection = document.createElement('div');
-        summarySection.className = 'card mb-4';
-        summarySection.innerHTML = `
-            <div class="card-header">
-                <h5 class="mb-0">Scenario Summary: ${scenarioName}</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6>Parameters</h6>
-                        ${this._formatScenarioParametersHtml(params, scenarioName)}
-                    </div>
-                    <div class="col-md-6">
-                        <h6>Simulation Results</h6>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-sm">
-                                <tbody>
-                                    <tr>
-                                        <th scope="row">Projected Corpus at Retirement</th>
-                                        <td>${FormatUtil.formatNumber(projectedCorpus)}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Success Rate</th>
-                                        <td>${successRate.toFixed(1)}%</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div id="scenarioStatusIndicator" class="mb-3"></div>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        trackingContent.appendChild(summarySection);
-        
-        // Create status indicator
-        this.createStatusIndicator('scenarioStatusIndicator', successRate);
-        
-        // Add corpus distribution chart
-        const distributionContainer = document.createElement('div');
-        distributionContainer.className = 'card mb-4';
-        distributionContainer.innerHTML = `
-            <div class="card-header">
-                <h5 class="mb-0">Final Corpus Distribution</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="scenarioDistributionChart"></canvas>
-            </div>
-        `;
-        
-        trackingContent.appendChild(distributionContainer);
-        
-        // Create corpus distribution chart
-        const distributionCtx = document.getElementById('scenarioDistributionChart').getContext('2d');
-        this.chartGenerator.createDistributionChart(distributionCtx, corpusValues);
-        
-        // Add year-by-year tracking table
+        // Create table for tracking data
         const tableContainer = document.createElement('div');
-        tableContainer.className = 'card mb-4';
-        tableContainer.innerHTML = `
-            <div class="card-header">
-                <h5 class="mb-0">Year-by-Year Tracking</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive"></div>
-            </div>
-        `;
+        tableContainer.className = 'table-responsive';
         
-        const tableResponsive = tableContainer.querySelector('.table-responsive');
         const table = document.createElement('table');
-        table.className = 'table table-sm table-hover';
+        table.className = 'table table-sm table-striped table-hover';
         
-        // Table header
+        // Create table header
         const thead = document.createElement('thead');
         thead.innerHTML = `
             <tr>
@@ -629,67 +556,103 @@ class UIController {
         // Assemble table
         table.appendChild(thead);
         table.appendChild(tbody);
-        tableResponsive.appendChild(table);
+        tableContainer.appendChild(table);
         
-        trackingContent.appendChild(tableContainer);
+        // Summary section
+        const summaryContainer = document.createElement('div');
+        summaryContainer.className = 'card mt-4';
         
-        // Add chart section
-        const chartContainer = document.createElement('div');
-        chartContainer.className = 'card mb-4';
-        chartContainer.innerHTML = `
-            <div class="card-header">
-                <h5 class="mb-0">Corpus Projection Over Time</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="trackingChart"></canvas>
-            </div>
+        const summaryHeader = document.createElement('div');
+        summaryHeader.className = 'card-header bg-light';
+        summaryHeader.innerHTML = '<h6 class="mb-0">Scenario Summary</h6>';
+        
+        const summaryBody = document.createElement('div');
+        summaryBody.className = 'card-body';
+        
+        // Create summary content
+        const formatter = new Intl.NumberFormat('en-US', {
+            style: 'decimal',
+            maximumFractionDigits: 0
+        });
+        
+        summaryBody.innerHTML = `
+            <p><strong>Scenario:</strong> ${scenarioName}</p>
+            <p><strong>Current Age:</strong> ${params.currentAge}</p>
+            <p><strong>Retirement Age:</strong> ${params.retirementAge}</p>
+            <p><strong>Projected Corpus at Retirement:</strong> ${formatter.format(projectedCorpus)}</p>
+            <p><strong>Annual Contribution:</strong> ${formatter.format(params.annualContribution)}</p>
+            <p><strong>Annual Expenses in Retirement:</strong> ${formatter.format(params.annualExpense)}</p>
+            <p><strong>Investment Return:</strong> ${(params.expectedReturn * 100).toFixed(1)}% ± ${(params.standardDeviation * 100).toFixed(1)}%</p>
         `;
         
+        // Assemble summary
+        summaryContainer.appendChild(summaryHeader);
+        summaryContainer.appendChild(summaryBody);
+        
+        // Add all elements to content container
         trackingContent.appendChild(chartContainer);
+        trackingContent.appendChild(summaryContainer);
+        trackingContent.appendChild(tableContainer);
         
-        // Create chart from tracking data
+        // Create chart
+        const corpusTracker = new CorpusTracker();
         const chartData = corpusTracker.getChartData(tracking);
-        const chartCtx = document.getElementById('trackingChart').getContext('2d');
         
-        new Chart(chartCtx, {
+        const ctx = document.getElementById('trackingChart').getContext('2d');
+        new Chart(ctx, {
             type: 'line',
             data: {
                 labels: chartData.labels,
                 datasets: [
                     {
-                        label: 'Median Corpus',
-                        data: chartData.medianValues,
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderWidth: 2,
-                        fill: false
+                        label: '10th Percentile',
+                        data: chartData.percentile10Values,
+                        borderColor: 'rgba(220, 53, 69, 0.5)',
+                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                        borderWidth: 1,
+                        fill: '+1'
                     },
                     {
                         label: '25th Percentile',
                         data: chartData.percentile25Values,
-                        borderColor: 'rgba(255, 206, 86, 1)',
-                        backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                        borderColor: 'rgba(255, 193, 7, 0.5)',
+                        backgroundColor: 'rgba(255, 193, 7, 0.1)',
                         borderWidth: 1,
-                        borderDash: [5, 5],
-                        fill: false
+                        fill: '+1'
+                    },
+                    {
+                        label: 'Median (50th)',
+                        data: chartData.medianValues,
+                        borderColor: 'rgba(13, 110, 253, 1)',
+                        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                        borderWidth: 2,
+                        fill: '+1'
                     },
                     {
                         label: '75th Percentile',
                         data: chartData.percentile75Values,
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(25, 135, 84, 0.5)',
+                        backgroundColor: 'rgba(25, 135, 84, 0.1)',
                         borderWidth: 1,
-                        borderDash: [5, 5],
+                        fill: '+1'
+                    },
+                    {
+                        label: '90th Percentile',
+                        data: chartData.percentile90Values,
+                        borderColor: 'rgba(13, 202, 240, 0.5)',
+                        backgroundColor: 'rgba(13, 202, 240, 0.1)',
+                        borderWidth: 1,
                         fill: false
                     }
                 ]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Corpus Value Over Time'
+                        text: 'Projected Corpus by Age'
                     },
                     tooltip: {
                         callbacks: {
@@ -786,86 +749,18 @@ class UIController {
             }
         });
         
-        // Add depletion risk chart
-        const riskChartContainer = document.createElement('div');
-        riskChartContainer.className = 'mt-4';
-        riskChartContainer.innerHTML = '<h4 class="mb-3">Depletion Risk by Age</h4>';
-        const riskCanvas = document.createElement('canvas');
-        riskCanvas.id = 'riskChart';
-        riskChartContainer.appendChild(riskCanvas);
-        
-        // Add the chart container to the modal
-        trackingContent.appendChild(riskChartContainer);
-        
-        // Create risk chart
-        const riskCtx = riskCanvas.getContext('2d');
-        new Chart(riskCtx, {
-            type: 'line',
-            data: {
-                labels: chartData.labels,
-                datasets: [
-                    {
-                        label: 'Depletion Risk',
-                        data: chartData.depletionRates,
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                        borderWidth: 2,
-                        fill: true,
-                        yAxisID: 'y'
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Probability of Running Out of Money'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.dataset.label}: ${context.raw.toFixed(1)}%`;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Age'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Risk (%)'
-                        },
-                        min: 0,
-                        max: 100
-                    }
-                }
-            }
-        });
-        
-        // Add print button
-        const printButtonContainer = document.createElement('div');
-        printButtonContainer.className = 'text-center mt-4';
+        // Add report actions buttons
+        const actionsContainer = document.createElement('div');
+        actionsContainer.className = 'mt-4 text-end';
         
         const printButton = document.createElement('button');
-        printButton.className = 'btn btn-outline-primary';
+        printButton.className = 'btn btn-outline-secondary';
         printButton.innerHTML = '<i class="bi bi-printer"></i> Print Report';
         printButton.onclick = () => this.printTrackingReport(scenarioName);
         
-        printButtonContainer.appendChild(printButton);
-        trackingContent.appendChild(printButtonContainer);
+        actionsContainer.appendChild(printButton);
         
-        // Resize charts
-        window.setTimeout(() => {
-            // Force a resize of charts
-            window.dispatchEvent(new Event('resize'));
-        }, 100);
+        trackingContent.appendChild(actionsContainer);
     }
     
     /**
@@ -1202,8 +1097,8 @@ class UIController {
         tableContainer.appendChild(table);
         
         // Summary section
-        const summarySection = document.createElement('div');
-        summarySection.className = 'card mt-4';
+        const summaryContainer = document.createElement('div');
+        summaryContainer.className = 'card mt-4';
         
         const summaryHeader = document.createElement('div');
         summaryHeader.className = 'card-header bg-light';
@@ -1237,11 +1132,12 @@ class UIController {
         trackingContent.appendChild(summaryContainer);
         trackingContent.appendChild(tableContainer);
         
-        // Create chart from tracking data
+        // Create chart
+        const corpusTracker = new CorpusTracker();
         const chartData = corpusTracker.getChartData(tracking);
-        const chartCtx = document.getElementById('trackingChart').getContext('2d');
         
-        new Chart(chartCtx, {
+        const ctx = document.getElementById('trackingChart').getContext('2d');
+        new Chart(ctx, {
             type: 'line',
             data: {
                 labels: chartData.labels,
@@ -1818,22 +1714,30 @@ class UIController {
      * @param {string} scenarioName - Name of the scenario
      */
     printTrackingReport(scenarioName) {
-        // Get the tracking content from the modal
-        const content = document.getElementById('trackingContent').cloneNode(true);
-        
-        // Get the scenario parameters
+        // Get the current parameters from the advanced form
         const advancedForm = document.getElementById('advancedModeForm');
         const baseParams = RetirementParameters.fromAdvancedForm(advancedForm);
+        
+        // Create modified parameters based on the scenario selected
         const scenarioParams = this._createScenarioParameters(baseParams, scenarioName);
+        
+        // Clone the tracking content
+        const content = document.getElementById('trackingContent').cloneNode(true);
+        
+        // Remove action buttons
+        const actionsContainer = content.querySelector('.text-end');
+        if (actionsContainer) {
+            actionsContainer.remove();
+        }
         
         // Format parameters for display
         const inputParamsHtml = this._formatScenarioParametersHtml(scenarioParams, scenarioName);
         
         // Capture chart images
+        const chartCanvases = content.querySelectorAll('canvas');
         const chartPromises = [];
-        const chartContainers = content.querySelectorAll('canvas');
         
-        chartContainers.forEach((canvas, index) => {
+        chartCanvases.forEach((canvas, index) => {
             const promise = new Promise(resolve => {
                 // Skip if the canvas is not a real chart
                 if (!canvas.id) {
@@ -1888,16 +1792,6 @@ class UIController {
                         .chart-image-container {
                             text-align: center;
                             margin-bottom: 1rem;
-                        }
-                        .status-indicator {
-                            display: flex;
-                            height: 20px;
-                            border-radius: 4px;
-                            overflow: hidden;
-                            margin-bottom: 10px;
-                        }
-                        .status-segment {
-                            height: 100%;
                         }
                     </style>
                 </head>
