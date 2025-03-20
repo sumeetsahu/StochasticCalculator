@@ -6,7 +6,7 @@ on:
       - main  # Set to your default branch
 
 permissions:
-  contents: write
+  contents: write  # Allow writing to the repository to create or update gh-pages branch
   pages: write
   id-token: write
 
@@ -25,10 +25,10 @@ jobs:
         uses: actions/configure-pages@v3
         
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v1
         with:
           path: 'web'
           
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v1
