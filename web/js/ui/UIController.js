@@ -687,7 +687,7 @@ class UIController {
         // Create an additional chart for inflation-adjusted expenses
         const expensesChartContainer = document.createElement('div');
         expensesChartContainer.className = 'mt-4';
-        expensesChartContainer.innerHTML = '<h4 class="mb-3">Inflation-Adjusted Annual Expenses</h4>';
+        expensesChartContainer.innerHTML = '<h4 class="mb-3">Annual Expenses with Inflation</h4>';
         const expensesCanvas = document.createElement('canvas');
         expensesCanvas.id = 'expensesChart';
         expensesChartContainer.appendChild(expensesCanvas);
@@ -703,7 +703,7 @@ class UIController {
                 labels: chartData.labels,
                 datasets: [
                     {
-                        label: 'Annual Expenses',
+                        label: 'Inflation-Adjusted Annual Expenses',
                         data: chartData.annualExpenses,
                         borderColor: 'rgba(255, 99, 132, 1)',
                         backgroundColor: 'rgba(255, 99, 132, 0.2)',
@@ -717,7 +717,7 @@ class UIController {
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Inflation-Adjusted Annual Expenses'
+                        text: 'Annual Expenses Adjusted for Inflation'
                     },
                     tooltip: {
                         callbacks: {
@@ -1225,7 +1225,7 @@ class UIController {
         // Create an additional chart for inflation-adjusted expenses
         const expensesChartContainer = document.createElement('div');
         expensesChartContainer.className = 'mt-4';
-        expensesChartContainer.innerHTML = '<h4 class="mb-3">Inflation-Adjusted Annual Expenses</h4>';
+        expensesChartContainer.innerHTML = '<h4 class="mb-3">Annual Expenses with Inflation</h4>';
         const expensesCanvas = document.createElement('canvas');
         expensesCanvas.id = 'expensesChart';
         expensesChartContainer.appendChild(expensesCanvas);
@@ -1241,7 +1241,7 @@ class UIController {
                 labels: chartData.labels,
                 datasets: [
                     {
-                        label: 'Annual Expenses',
+                        label: 'Inflation-Adjusted Annual Expenses',
                         data: chartData.annualExpenses,
                         borderColor: 'rgba(255, 99, 132, 1)',
                         backgroundColor: 'rgba(255, 99, 132, 0.2)',
@@ -1255,7 +1255,7 @@ class UIController {
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Inflation-Adjusted Annual Expenses'
+                        text: 'Annual Expenses Adjusted for Inflation'
                     },
                     tooltip: {
                         callbacks: {
