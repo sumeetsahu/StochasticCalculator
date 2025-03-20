@@ -29,7 +29,7 @@ class ScenarioGenerator {
         const annualContribution = params.annualContribution;
         
         // Progress tracking
-        let totalScenarios = 5;  // Adjust based on number of scenarios
+        let totalScenarios = 6;  // Adjust based on number of scenarios
         let completedScenarios = 0;
         
         const updateProgress = () => {
@@ -38,6 +38,19 @@ class ScenarioGenerator {
                 progressCallback(completedScenarios / totalScenarios);
             }
         };
+        
+        // Scenario 0: No Change (use current parameters)
+        const noChangeParams = this._cloneParams(params);
+        const noChangeProjectedCorpus = this.monteCarloEngine.calculateProjectedCorpus(noChangeParams);
+        const noChangeSuccessRate = this.monteCarloEngine.simulateRetirementWithCorpus(noChangeProjectedCorpus, noChangeParams);
+        
+        scenarios['No Change'] = 
+            `<strong>Continue with current plan</strong><br>` +
+            `Your current retirement plan has a ${noChangeSuccessRate.toFixed(1)}% success rate with a projected corpus ` +
+            `of ${this._formatCurrency(noChangeProjectedCorpus)} at retirement.<br>` +
+            `<em>This is your baseline scenario with no modifications to your current plan.</em>`;
+        
+        updateProgress();
         
         // Scenario 1: Delay retirement
         if (currentAge < retirementAge - 1) {
