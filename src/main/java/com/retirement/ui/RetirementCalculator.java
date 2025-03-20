@@ -8,7 +8,6 @@ import com.retirement.model.YearlyTracking;
 import com.retirement.report.ReportGenerator;
 import com.retirement.util.LocaleConfig;
 
-import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.InputMismatchException;
@@ -26,7 +25,6 @@ public class RetirementCalculator {
     private final CorpusTracker corpusTracker;
     private final ScenarioGenerator scenarioGenerator;
     private final ReportGenerator reportGenerator;
-    private NumberFormat moneyFormat;
     
     /**
      * Constructor for RetirementCalculator.
@@ -37,7 +35,6 @@ public class RetirementCalculator {
         this.corpusTracker = new CorpusTracker();
         this.scenarioGenerator = new ScenarioGenerator();
         this.reportGenerator = new ReportGenerator();
-        this.moneyFormat = LocaleConfig.getCurrencyFormatter();
     }
     
     /**
@@ -227,7 +224,7 @@ public class RetirementCalculator {
                     double additionalContribution = scenarioGenerator.calculateRequiredAdditionalContribution(params, targetSuccessRate);
                     updatedParams.setAnnualContribution(annualContribution + additionalContribution);
                     System.out.println("\nIncreasing annual contribution to " + 
-                                     moneyFormat.format(annualContribution + additionalContribution));
+                                     formatMoney(annualContribution + additionalContribution));
                     break;
                 case 2: // Retirement Age Scenario
                     int additionalYears = scenarioGenerator.calculateRequiredRetirementDelay(params, targetSuccessRate);
@@ -238,7 +235,7 @@ public class RetirementCalculator {
                     double expenseReduction = scenarioGenerator.calculateRequiredExpenseReduction(params, targetSuccessRate);
                     updatedParams.setAnnualExpense(annualExpense - expenseReduction);
                     System.out.println("\nReducing annual expenses to " + 
-                                     moneyFormat.format(annualExpense - expenseReduction));
+                                     formatMoney(annualExpense - expenseReduction));
                     break;
                 case 4: // Balanced Approach
                     Map<String, Object> balancedApproach = scenarioGenerator.calculateBalancedApproach(params, targetSuccessRate);
@@ -253,14 +250,14 @@ public class RetirementCalculator {
                     System.out.println("\nApplying balanced approach:");
                     if (balancedContribution > 0) {
                         System.out.println("- Increasing annual contribution to " + 
-                                         moneyFormat.format(annualContribution + balancedContribution));
+                                         formatMoney(annualContribution + balancedContribution));
                     }
                     if (balancedDelay > 0) {
                         System.out.println("- Delaying retirement to age " + (retirementAge + balancedDelay));
                     }
                     if (balancedExpenseReduction > 0) {
                         System.out.println("- Reducing annual expenses to " + 
-                                         moneyFormat.format(annualExpense - balancedExpenseReduction));
+                                         formatMoney(annualExpense - balancedExpenseReduction));
                     }
                     break;
                 case 5: // No changes
@@ -392,13 +389,20 @@ public class RetirementCalculator {
                 break;
         }
         
-        // Refresh the money formatter
-        this.moneyFormat = LocaleConfig.getCurrencyFormatter();
-        
         System.out.println("Locale set to: " + LocaleConfig.getCurrentLocale().getDisplayName());
         System.out.println("Currency: " + LocaleConfig.getCurrency().getDisplayName() + 
                          " (" + LocaleConfig.getCurrencySymbol() + ")");
         System.out.println("Example format: " + LocaleConfig.formatMoney(12345.67));
+    }
+    
+    /**
+     * Format a money value for display.
+     * 
+     * @param amount The money value to format
+     * @return Formatted money string
+     */
+    private String formatMoney(double amount) {
+        return LocaleConfig.formatMoney(amount);
     }
     
     /**
@@ -497,9 +501,5 @@ public class RetirementCalculator {
         }
         
         return input.startsWith("y");
-    }
-    
-    private String formatMoney(double amount) {
-        return moneyFormat.format(amount);
     }
 }

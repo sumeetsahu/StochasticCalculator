@@ -9,7 +9,7 @@ import java.util.Locale;
  * Provides centralized locale-aware currency formatting and configuration.
  */
 public class LocaleConfig {
-    private static Locale currentLocale = new Locale.Builder().setLanguage("en").setRegion("IN").build(); // Default locale is now English-India
+    private static Locale currentLocale = new Locale.Builder().setLanguage("en").setRegion("IN").build(); // Default is English-India
     private static NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(currentLocale);
     
     /**
@@ -64,15 +64,34 @@ public class LocaleConfig {
     
     /**
      * Format a money value according to the current locale.
+     * Formats in lakhs and crores for Indian locale, and in M/B for others.
+     * 
      * @param value The money value to format
      * @return Formatted money string
      */
     public static String formatMoney(double value) {
-        if (value >= 1_000_000) {
-            // For large values, format with millions
-            return currencyFormatter.format(value / 1_000_000) + "M";
+        // Check if the locale is Indian
+        if (currentLocale.getCountry().equals("IN")) {
+            // Use Indian number format (lakhs and crores)
+            if (value >= 10000000) { // 1 crore (1,00,00,000) or more
+                return String.format("%s%.2f Cr", 
+                       currencyFormatter.getCurrency().getSymbol(), 
+                       value / 10000000);
+            } else if (value >= 100000) { // 1 lakh (1,00,000) or more
+                return String.format("%s%.2f L", 
+                       currencyFormatter.getCurrency().getSymbol(), 
+                       value / 100000);
+            }
         } else {
-            return currencyFormatter.format(value);
+            // For non-Indian locales, use millions format for large numbers
+            if (value >= 1000000) {
+                return String.format("%s%.2fM", 
+                       currencyFormatter.getCurrency().getSymbol(), 
+                       value / 1000000);
+            }
         }
+        
+        // For smaller values, use standard currency formatting
+        return currencyFormatter.format(value);
     }
 }

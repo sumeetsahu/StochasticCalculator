@@ -137,6 +137,19 @@ chmod +x custom_demo.exp
 export LOCALE="$LOCALE"
 export CURRENCY_SYMBOL="$CURRENCY_SYMBOL"
 
+# Format display based on locale
+if [[ "$LOCALE" == "en-IN" || "$LOCALE" == "hi-IN" ]]; then
+    # Format amounts in Indian lakhs and crores
+    CORPUS_DISPLAY="${CURRENCY_SYMBOL} 20L"
+    EXPENSE_DISPLAY="${CURRENCY_SYMBOL} 1.2L"
+    CONTRIBUTION_DISPLAY="${CURRENCY_SYMBOL} 5L"
+else
+    # Format amounts in millions for other locales
+    CORPUS_DISPLAY="${CURRENCY_SYMBOL} 2M"
+    EXPENSE_DISPLAY="${CURRENCY_SYMBOL} 120K"
+    CONTRIBUTION_DISPLAY="${CURRENCY_SYMBOL} 500K"
+fi
+
 # Run the demo
 echo "======================================================"
 echo "  RUNNING CUSTOM SCENARIO DEMO"
@@ -145,9 +158,9 @@ echo "  Locale: $LOCALE"
 echo "  Current Age: 40"
 echo "  Retirement Age: 50"
 echo "  Life Expectancy: 100"
-echo "  Initial Corpus: $CURRENCY_SYMBOL 2M"
-echo "  Annual Expenses: $CURRENCY_SYMBOL 120K"
-echo "  Annual Contribution: $CURRENCY_SYMBOL 500K"
+echo "  Initial Corpus: $CORPUS_DISPLAY"
+echo "  Annual Expenses: $EXPENSE_DISPLAY"
+echo "  Annual Contribution: $CONTRIBUTION_DISPLAY"
 echo "  Expected Return: 10%"
 echo "  Standard Deviation: 15%"
 echo "  Inflation Rate: 8%"
