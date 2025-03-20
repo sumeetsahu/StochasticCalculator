@@ -58,10 +58,9 @@ class CorpusTracker {
                     
                     // If retired, withdraw monthly expenses
                     if (isRetired) {
-                        const yearsSinceRetirement = params.currentAge > 0 ? 
-                            age - params.retirementAge : year;
+                        // Inflation adjustment is based on the number of years since the start of the simulation
                         const inflationFactor = params.adjustForInflation ? 
-                            Math.pow(1 + params.inflation, yearsSinceRetirement) : 1.0;
+                            Math.pow(1 + params.inflation, year) : 1.0;
                         const monthlyExpense = ((params.annualExpense * inflationFactor) - 
                             (params.additionalRetirementIncome || 0)) / 12.0;
                         corpus -= Math.max(0, monthlyExpense);
@@ -101,10 +100,9 @@ class CorpusTracker {
             const depletionRate = (depletedCount / numSimulations) * 100;
             
             // Calculate inflation-adjusted annual expense
-            const yearsSinceRetirement = params.currentAge > 0 && age >= params.retirementAge ? 
-                age - params.retirementAge : (params.currentAge > 0 ? 0 : year);
+            // Adjust for inflation from current age to the current year
             const inflationFactor = params.adjustForInflation ? 
-                Math.pow(1 + params.inflation, yearsSinceRetirement) : 1.0;
+                Math.pow(1 + params.inflation, year) : 1.0;
             const adjustedAnnualExpense = params.annualExpense * inflationFactor;
             
             // Create tracking object
