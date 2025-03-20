@@ -351,40 +351,27 @@ class UIController {
         // Use setTimeout to allow the UI to update before starting calculations
         setTimeout(() => {
             // Run the full simulation first
-            this.updateModalProgress(0.05, 'Calculating projected corpus...');
-            
             const projectedCorpus = this.monteCarloEngine.calculateProjectedCorpus(scenarioParams);
-            
-            this.updateModalProgress(0.1, 'Running Monte Carlo simulations...');
-            
             const successRate = this.monteCarloEngine.simulateRetirementWithCorpus(
                 projectedCorpus, 
                 scenarioParams, 
-                progress => this.updateModalProgress(0.1 + progress * 0.4, 'Running simulations: ' + Math.round(progress * 100) + '%')
+                progress => this.updateModalProgress(progress * 0.5, 'Running simulations...')
             );
             
             // Get the final corpus values from the full simulation
-            this.updateModalProgress(0.5, 'Processing simulation results...');
             const corpusValues = this.monteCarloEngine.getLastSimulationResults();
             
             // Then generate year-by-year tracking
-            this.updateModalProgress(0.55, 'Generating year-by-year tracking...');
             const corpusTracker = new CorpusTracker();
             const tracking = corpusTracker.generateYearlyTracking(
                 scenarioParams, 
                 scenarioParams.currentCorpus,
-                progress => this.updateModalProgress(0.55 + progress * 0.4, 'Tracking corpus by year: ' + Math.round(progress * 100) + '%')
+                progress => this.updateModalProgress(0.5 + progress * 0.5, 'Generating year-by-year tracking...')
             );
             
-            // Final preparation
-            this.updateModalProgress(0.95, 'Preparing visualization...');
-            
             // Update the modal content with tracking results and simulation outcomes
-            setTimeout(() => {
-                this.updateModalProgress(1, 'Complete!');
-                this.displayYearByYearTracking(scenarioName, scenarioParams, tracking, projectedCorpus, successRate, corpusValues);
-            }, 200);
-        }, 100);
+            this.displayYearByYearTracking(scenarioName, scenarioParams, tracking, projectedCorpus, successRate, corpusValues);
+        }, 50);
     }
     
     /**
@@ -424,21 +411,6 @@ class UIController {
             progressContainer.className = 'progress-container mb-4';
             progressContainer.id = 'modalProgressContainer';
             
-            const statusAlert = document.createElement('div');
-            statusAlert.className = 'alert alert-info mb-3';
-            statusAlert.id = 'modalStatusAlert';
-            statusAlert.innerHTML = `
-                <div class="d-flex align-items-center">
-                    <div class="spinner-border spinner-border-sm me-2" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <div>
-                        <strong>Running simulations for "${scenarioName}" scenario...</strong>
-                        <div id="modalStatusDetails" class="text-muted mt-1">Initializing...</div>
-                    </div>
-                </div>
-            `;
-            
             const progressBar = document.createElement('div');
             progressBar.className = 'progress';
             
@@ -453,11 +425,10 @@ class UIController {
             
             const progressText = document.createElement('div');
             progressText.id = 'modalProgressText';
-            progressText.className = 'text-center text-muted mt-2 small';
-            progressText.textContent = 'Preparing simulations...';
+            progressText.className = 'text-center text-muted mt-2';
+            progressText.textContent = 'Calculating...';
             
             progressBar.appendChild(progressBarInner);
-            progressContainer.appendChild(statusAlert);
             progressContainer.appendChild(progressBar);
             progressContainer.appendChild(progressText);
             
@@ -489,23 +460,7 @@ class UIController {
         
         // Reset progress and content
         document.getElementById('modalProgressBar').style.width = '0%';
-        document.getElementById('modalProgressText').textContent = 'Preparing simulations...';
-        
-        // Update status message
-        const statusAlert = document.getElementById('modalStatusAlert');
-        if (statusAlert) {
-            statusAlert.innerHTML = `
-                <div class="d-flex align-items-center">
-                    <div class="spinner-border spinner-border-sm me-2" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <div>
-                        <strong>Running simulations for "${scenarioName}" scenario...</strong>
-                        <div id="modalStatusDetails" class="text-muted mt-1">Setting up parameters...</div>
-                    </div>
-                </div>
-            `;
-        }
+        document.getElementById('modalProgressText').textContent = 'Initializing...';
         
         const trackingContent = document.getElementById('trackingContent');
         trackingContent.style.display = 'none';
@@ -527,17 +482,12 @@ class UIController {
     updateModalProgress(progress, message) {
         const progressBar = document.getElementById('modalProgressBar');
         const progressText = document.getElementById('modalProgressText');
-        const statusDetails = document.getElementById('modalStatusDetails');
         
         if (progressBar && progressText) {
             const percentage = Math.round(progress * 100);
             progressBar.style.width = `${percentage}%`;
             progressBar.setAttribute('aria-valuenow', percentage);
-            progressText.textContent = `${percentage}% complete - ${message || 'Processing...'}`;
-            
-            if (statusDetails) {
-                statusDetails.textContent = message || 'Processing...';
-            }
+            progressText.textContent = message || 'Calculating...';
         }
     }
     
@@ -553,10 +503,11 @@ class UIController {
      */
     displayYearByYearTracking(scenarioName, params, tracking, projectedCorpus, successRate, corpusValues) {
         // Show tracking content and hide progress
-        document.getElementById('modalProgressContainer').style.display = 'none';
-        
         const trackingContent = document.getElementById('trackingContent');
         trackingContent.style.display = 'block';
+        
+        const progressContainer = document.getElementById('modalProgressContainer');
+        progressContainer.style.display = 'none';
         
         // Clear previous content
         trackingContent.innerHTML = '';
