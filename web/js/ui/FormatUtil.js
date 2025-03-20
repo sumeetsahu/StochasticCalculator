@@ -3,32 +3,60 @@
  */
 class FormatUtil {
     /**
-     * Format a number as currency with dollar sign and commas
+     * Format a number with commas for readability (without currency symbol)
      * 
      * @param {number} amount - The amount to format
-     * @returns {string} Formatted currency string
+     * @returns {string} Formatted number string
      */
     static formatCurrency(amount) {
         return new Intl.NumberFormat('en-US', { 
-            style: 'currency', 
-            currency: 'USD',
+            style: 'decimal', 
             maximumFractionDigits: 0
         }).format(amount);
     }
     
     /**
-     * Format a number as currency with abbreviated values for large numbers
+     * Format a number with abbreviated values for large numbers (without currency symbol)
      * 
      * @param {number} amount - The amount to format
-     * @returns {string} Formatted currency string
+     * @returns {string} Formatted number string
      */
     static formatCurrencyShort(amount) {
         if (amount >= 1000000) {
-            return '$' + (amount / 1000000).toFixed(1) + 'M';
+            return (amount / 1000000).toFixed(1) + 'M';
         } else if (amount >= 1000) {
-            return '$' + (amount / 1000).toFixed(1) + 'K';
+            return (amount / 1000).toFixed(1) + 'K';
         } else {
-            return '$' + amount.toFixed(0);
+            return amount.toFixed(0);
+        }
+    }
+    
+    /**
+     * Format a number with commas for readability
+     * 
+     * @param {number} amount - The amount to format
+     * @param {number} decimals - Number of decimal places
+     * @returns {string} Formatted number string
+     */
+    static formatNumber(amount, decimals = 0) {
+        return new Intl.NumberFormat('en-US', {
+            maximumFractionDigits: decimals
+        }).format(amount);
+    }
+    
+    /**
+     * Format a number with abbreviated values for large numbers
+     * 
+     * @param {number} amount - The amount to format
+     * @returns {string} Formatted number string
+     */
+    static formatNumberShort(amount) {
+        if (amount >= 1000000) {
+            return (amount / 1000000).toFixed(1) + 'M';
+        } else if (amount >= 1000) {
+            return (amount / 1000).toFixed(1) + 'K';
+        } else {
+            return amount.toFixed(0);
         }
     }
     
@@ -44,23 +72,16 @@ class FormatUtil {
     }
     
     /**
-     * Format a number with commas
-     * 
-     * @param {number} amount - The amount to format
-     * @returns {string} Formatted number string
-     */
-    static formatNumber(amount) {
-        return new Intl.NumberFormat('en-US').format(amount);
-    }
-    
-    /**
-     * Format a date in a friendly format
+     * Format a date as a string
      * 
      * @param {Date} date - The date to format
      * @returns {string} Formatted date string
      */
     static formatDate(date) {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return date.toLocaleDateString('en-US', options);
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
     }
 }

@@ -211,7 +211,7 @@ class UIController {
         resultsSection.style.display = 'block';
         
         // Update text values
-        document.getElementById('requiredCorpus').textContent = FormatUtil.formatCurrency(requiredCorpus);
+        document.getElementById('requiredCorpus').textContent = FormatUtil.formatNumber(requiredCorpus);
         document.getElementById('successRate').textContent = successRate.toFixed(1);
         
         // Create status indicator
@@ -253,9 +253,9 @@ class UIController {
         resultsSection.style.display = 'block';
         
         // Update text values
-        document.getElementById('projectedCorpus').textContent = FormatUtil.formatCurrency(projectedCorpus);
+        document.getElementById('projectedCorpus').textContent = FormatUtil.formatNumber(projectedCorpus);
         document.getElementById('currentSuccessRate').textContent = currentSuccessRate.toFixed(1);
-        document.getElementById('advRequiredCorpus').textContent = FormatUtil.formatCurrency(requiredCorpus);
+        document.getElementById('advRequiredCorpus').textContent = FormatUtil.formatNumber(requiredCorpus);
         
         // Create status indicator
         this.createStatusIndicator('advancedStatusIndicator', currentSuccessRate);
@@ -542,9 +542,9 @@ class UIController {
             row.innerHTML = `
                 <td>${yearData.year + 1}</td>
                 <td>${yearData.age}</td>
-                <td>${FormatUtil.formatCurrency(yearData.medianValue)}</td>
-                <td>${FormatUtil.formatCurrency(yearData.percentiles[25])}</td>
-                <td>${FormatUtil.formatCurrency(yearData.percentiles[75])}</td>
+                <td>${FormatUtil.formatNumber(yearData.medianValue)}</td>
+                <td>${FormatUtil.formatNumber(yearData.percentiles[25])}</td>
+                <td>${FormatUtil.formatNumber(yearData.percentiles[75])}</td>
                 <td>${yearData.depletionRate.toFixed(1)}%</td>
             `;
             
@@ -569,8 +569,7 @@ class UIController {
         
         // Create summary content
         const formatter = new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
+            style: 'decimal',
             maximumFractionDigits: 0
         });
         
@@ -656,7 +655,7 @@ class UIController {
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return `${context.dataset.label}: ${FormatUtil.formatCurrency(context.raw)}`;
+                                return `${context.dataset.label}: ${FormatUtil.formatNumber(context.raw)}`;
                             }
                         }
                     }
@@ -675,7 +674,7 @@ class UIController {
                         },
                         ticks: {
                             callback: function(value) {
-                                return FormatUtil.formatCurrencyShort(value);
+                                return FormatUtil.formatNumberShort(value);
                             }
                         }
                     }
@@ -1014,9 +1013,9 @@ class UIController {
             row.innerHTML = `
                 <td>${yearData.year + 1}</td>
                 <td>${yearData.age}</td>
-                <td>${FormatUtil.formatCurrency(yearData.medianValue)}</td>
-                <td>${FormatUtil.formatCurrency(yearData.percentiles[25])}</td>
-                <td>${FormatUtil.formatCurrency(yearData.percentiles[75])}</td>
+                <td>${FormatUtil.formatNumber(yearData.medianValue)}</td>
+                <td>${FormatUtil.formatNumber(yearData.percentiles[25])}</td>
+                <td>${FormatUtil.formatNumber(yearData.percentiles[75])}</td>
                 <td>${yearData.depletionRate.toFixed(1)}%</td>
             `;
             
@@ -1041,8 +1040,7 @@ class UIController {
         
         // Create summary content
         const formatter = new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
+            style: 'decimal',
             maximumFractionDigits: 0
         });
         
@@ -1128,7 +1126,7 @@ class UIController {
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return `${context.dataset.label}: ${FormatUtil.formatCurrency(context.raw)}`;
+                                return `${context.dataset.label}: ${FormatUtil.formatNumber(context.raw)}`;
                             }
                         }
                     }
@@ -1147,7 +1145,7 @@ class UIController {
                         },
                         ticks: {
                             callback: function(value) {
-                                return FormatUtil.formatCurrencyShort(value);
+                                return FormatUtil.formatNumberShort(value);
                             }
                         }
                     }
@@ -1803,8 +1801,7 @@ class UIController {
      */
     _formatInputParametersHtml(params, mode) {
         const formatter = new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
+            style: 'decimal',
             maximumFractionDigits: 0
         });
         
@@ -1912,8 +1909,7 @@ class UIController {
      */
     _formatScenarioParametersHtml(params, scenarioName) {
         const formatter = new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
+            style: 'decimal',
             maximumFractionDigits: 0
         });
         
@@ -1969,15 +1965,7 @@ class UIController {
                 </tr>
                 <tr>
                     <th scope="row">Expected Annual Return</th>
-                    <td>${(params.expectedReturn * 100).toFixed(1)}%</td>
-                </tr>
-                <tr>
-                    <th scope="row">Annual Standard Deviation</th>
-                    <td>${(params.standardDeviation * 100).toFixed(1)}%</td>
-                </tr>
-                <tr>
-                    <th scope="row">Annual Inflation Rate</th>
-                    <td>${(params.inflation * 100).toFixed(1)}%</td>
+                    <td>${(params.expectedReturn * 100).toFixed(1)}% ± ${(params.standardDeviation * 100).toFixed(1)}%</td>
                 </tr>
             </tbody>
         `;
