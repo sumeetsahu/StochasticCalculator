@@ -100,6 +100,13 @@ class CorpusTracker {
             const depletedCount = values.filter(v => v <= 0).length;
             const depletionRate = (depletedCount / numSimulations) * 100;
             
+            // Calculate inflation-adjusted annual expense
+            const yearsSinceRetirement = params.currentAge > 0 && age >= params.retirementAge ? 
+                age - params.retirementAge : (params.currentAge > 0 ? 0 : year);
+            const inflationFactor = params.adjustForInflation ? 
+                Math.pow(1 + params.inflation, yearsSinceRetirement) : 1.0;
+            const adjustedAnnualExpense = params.annualExpense * inflationFactor;
+            
             // Create tracking object
             yearlyTracking.push({
                 year: year,
@@ -107,7 +114,9 @@ class CorpusTracker {
                 percentiles: percentiles,
                 depletionRate: depletionRate,
                 medianValue: percentiles[50],
-                mean: values.reduce((a, b) => a + b, 0) / numSimulations
+                mean: values.reduce((a, b) => a + b, 0) / numSimulations,
+                adjustedAnnualExpense: adjustedAnnualExpense,
+                netAnnualExpense: Math.max(0, adjustedAnnualExpense - (params.additionalRetirementIncome || 0))
             });
         }
         
@@ -132,6 +141,7 @@ class CorpusTracker {
         const percentile10Values = yearlyTracking.map(tracking => tracking.percentiles[10]);
         const percentile90Values = yearlyTracking.map(tracking => tracking.percentiles[90]);
         const depletionRates = yearlyTracking.map(tracking => tracking.depletionRate);
+        const annualExpenses = yearlyTracking.map(tracking => tracking.adjustedAnnualExpense);
         
         return {
             labels: labels,
@@ -140,7 +150,8 @@ class CorpusTracker {
             percentile75Values: percentile75Values,
             percentile10Values: percentile10Values,
             percentile90Values: percentile90Values,
-            depletionRates: depletionRates
+            depletionRates: depletionRates,
+            annualExpenses: annualExpenses
         };
     }
 }
