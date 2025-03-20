@@ -58,7 +58,7 @@ class ScenarioGenerator {
             scenarios['Delay Retirement'] = 
                 `<strong>Delay retirement by 2 years</strong><br>` +
                 `Delaying retirement to age ${retirementAge + 2} increases your success rate ` +
-                `to ${successRate.toFixed(1)}% with a projected corpus of $${this._formatCurrency(projectedCorpus)}.<br>` +
+                `to ${successRate.toFixed(1)}% with a projected corpus of ${this._formatCurrency(projectedCorpus)}.<br>` +
                 `<em>This gives your investments more time to grow and reduces the retirement period.</em>`;
             
             updateProgress();
@@ -83,9 +83,9 @@ class ScenarioGenerator {
         
         scenarios['Increase Contributions'] = 
             `<strong>Increase annual contributions by 20%</strong><br>` +
-            `Increasing your annual contribution to $${this._formatCurrency(increasedContribution)} ` +
+            `Increasing your annual contribution to ${this._formatCurrency(increasedContribution)} ` +
             `improves your success rate to ${increaseSuccessRate.toFixed(1)}% with a projected corpus ` +
-            `of $${this._formatCurrency(increaseProjectedCorpus)}.<br>` +
+            `of ${this._formatCurrency(increaseProjectedCorpus)}.<br>` +
             `<em>This directly increases your retirement savings, building a larger corpus.</em>`;
         
         updateProgress();
@@ -101,7 +101,7 @@ class ScenarioGenerator {
         
         scenarios['Reduce Expenses'] = 
             `<strong>Reduce retirement expenses by 10%</strong><br>` +
-            `Reducing your planned annual expenses to $${this._formatCurrency(reducedExpense)} ` +
+            `Reducing your planned annual expenses to ${this._formatCurrency(reducedExpense)} ` +
             `increases your success rate to ${reduceSuccessRate.toFixed(1)}% with the same projected corpus.<br>` +
             `<em>Lower expenses mean your money lasts longer in retirement.</em>`;
         
@@ -126,7 +126,7 @@ class ScenarioGenerator {
         
         scenarios['Additional Income'] = 
             `<strong>Secure additional retirement income</strong><br>` +
-            `Finding an additional $${this._formatCurrency(additionalIncome - params.additionalRetirementIncome)} ` +
+            `Finding an additional ${this._formatCurrency(additionalIncome - params.additionalRetirementIncome)} ` +
             `of annual retirement income improves your success rate to ${incomeSuccessRate.toFixed(1)}%.<br>` +
             `<em>Sources could include part-time work, rental income, or higher social security benefits.</em>`;
         
@@ -146,7 +146,7 @@ class ScenarioGenerator {
             `<strong>Optimize investment strategy</strong><br>` +
             `Improving your returns by 0.5% and reducing volatility by 0.5% through better asset allocation ` +
             `increases your success rate to ${optimizedSuccessRate.toFixed(1)}% with a projected corpus ` +
-            `of $${this._formatCurrency(optimizedProjectedCorpus)}.<br>` +
+            `of ${this._formatCurrency(optimizedProjectedCorpus)}.<br>` +
             `<em>Even small improvements in returns and risk can significantly impact outcomes.</em>`;
         
         updateProgress();
@@ -189,13 +189,13 @@ class ScenarioGenerator {
      * Format a number as currency
      * 
      * @param {number} amount - The amount to format
-     * @returns {string} Formatted currency string
+     * @returns {string} Formatted number string
      * @private
      */
     _formatCurrency(amount) {
-        // Format with commas
-        return amount.toLocaleString('en-US', {
+        return new Intl.NumberFormat('en-US', {
+            style: 'decimal',
             maximumFractionDigits: 0
-        });
+        }).format(amount);
     }
 }
