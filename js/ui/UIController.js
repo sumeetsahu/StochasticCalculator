@@ -300,8 +300,16 @@ class UIController {
             const card = document.createElement('div');
             card.className = 'card h-100 scenario-card';
             
+            // Use a different style for the "No Change" scenario
+            if (name === 'No Change') {
+                card.className += ' border-primary';
+            }
+            
             const cardHeader = document.createElement('div');
             cardHeader.className = 'card-header bg-light';
+            if (name === 'No Change') {
+                cardHeader.className = 'card-header bg-light text-primary';
+            }
             cardHeader.innerHTML = `<h5 class="mb-0">${name}</h5>`;
             
             const cardBody = document.createElement('div');
@@ -313,6 +321,9 @@ class UIController {
             
             const viewButton = document.createElement('button');
             viewButton.className = 'btn btn-sm btn-outline-primary';
+            if (name === 'No Change') {
+                viewButton.className = 'btn btn-sm btn-primary';
+            }
             viewButton.textContent = 'View Year-by-Year Tracking';
             viewButton.dataset.scenarioName = name;
             viewButton.addEventListener('click', this.handleScenarioViewClick.bind(this));
@@ -838,8 +849,16 @@ class UIController {
             const card = document.createElement('div');
             card.className = 'card h-100 scenario-card';
             
+            // Use a different style for the "No Change" scenario
+            if (name === 'No Change') {
+                card.className += ' border-primary';
+            }
+            
             const cardHeader = document.createElement('div');
             cardHeader.className = 'card-header bg-light';
+            if (name === 'No Change') {
+                cardHeader.className = 'card-header bg-light text-primary';
+            }
             cardHeader.innerHTML = `<h5 class="mb-0">${name}</h5>`;
             
             const cardBody = document.createElement('div');
@@ -851,6 +870,9 @@ class UIController {
             
             const viewButton = document.createElement('button');
             viewButton.className = 'btn btn-sm btn-outline-primary';
+            if (name === 'No Change') {
+                viewButton.className = 'btn btn-sm btn-primary';
+            }
             viewButton.textContent = 'View Year-by-Year Tracking';
             viewButton.dataset.scenarioName = name;
             viewButton.addEventListener('click', this.handleScenarioViewClick.bind(this));
@@ -1333,6 +1355,10 @@ class UIController {
         
         // Modify parameters based on scenario
         switch (scenarioName) {
+            case 'No Change':
+                // No changes needed - use parameters as-is
+                break;
+                
             case 'Delay Retirement':
                 params.setAdvancedParameters(
                     baseParams.currentAge,
